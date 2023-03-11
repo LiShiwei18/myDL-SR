@@ -8,13 +8,14 @@ import os
 import tensorflow as tf
 from models import *
 from utils.utils import prctile_norm, rm_outliers
+from tqdm import tqdm
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_dir", type=str, default="../dataset/test/F-actin")
 parser.add_argument("--folder_test", type=str, default="input_wide_field_images")
-parser.add_argument("--gpu_id", type=str, default="4")
-parser.add_argument("--gpu_memory_fraction", type=float, default=0)
+parser.add_argument("--gpu_id", type=str, default="0")  #只有一块GPU，默认0
+parser.add_argument("--gpu_memory_fraction", type=float, default=0) #占用GPU显存的比例
 parser.add_argument("--model_name", type=str, default="DFGAN")
 parser.add_argument("--model_weights", type=str, default="../trained_models/DFGAN-SISR_F-actin/weights.best")
 parser.add_argument("--input_height", type=int, default=502)
@@ -53,7 +54,7 @@ if not img_path:
     n_channel = len(glob.glob(img_path[0] + '/*.tif'))
     output_dir = output_dir + 'SIM'
 else:
-    flag_recon = 0
+    flag_recon = 0  #置为0表示进行SISR超分辨率重建，为1表示进行SIM重建
     n_channel = 1
     output_dir = output_dir + 'SISR'
 
@@ -71,8 +72,8 @@ m.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['mae'])
 
 print('Processing ' + test_images_path + '...')
 im_count = 0
-for curp in img_path:
-    if flag_recon:
+for curp in tqdm(img_path):
+    if flag_recon:  #SIM重建
         imgfile = glob.glob(curp + '/*.tif')
         imgfile.sort()
         img_batch = []
@@ -81,12 +82,12 @@ for curp in img_path:
             img_batch.append(img)
         img = np.array(img_batch).transpose((1, 2, 0))
         img = img[np.newaxis, :, :, :]
-    else:
+    else:   #SISR超分辨率重建
         img = np.array(imageio.imread(curp).astype(np.float))
         img = img[np.newaxis, :, :, np.newaxis]
 
-    img = prctile_norm(img)
-    pr = rm_outliers(prctile_norm(np.squeeze(m.predict(img))))
+    img = prctile_norm(img) #所有像素归一化到0-1之间
+    pr = rm_outliers(prctile_norm(np.squeeze(m.predict(img))))  #预测结果归一化，去除异常值
 
     outName = curp.replace(test_images_path, output_dir)
     if not outName[-4:] == '.tif':
