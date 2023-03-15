@@ -1,0 +1,33 @@
+Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
+Collecting scikit-image
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/0e/ba/53e1bfbdfd0f94514d71502e3acea494a8b4b57c457adbc333ef386485da/scikit_image-0.17.2-cp36-cp36m-manylinux1_x86_64.whl (12.4 MB)
+Collecting networkx>=2.0
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/f3/b7/c7f488101c0bb5e4178f3cde416004280fd40262433496830de8a8c21613/networkx-2.5.1-py3-none-any.whl (1.6 MB)
+Collecting matplotlib!=3.0.0,>=2.0.0
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/09/03/b7b30fa81cb687d1178e085d0f01111ceaea3bf81f9330c937fb6f6c8ca0/matplotlib-3.3.4-cp36-cp36m-manylinux1_x86_64.whl (11.5 MB)
+Requirement already satisfied: scipy>=1.0.1 in /home/qwe/miniconda3/envs/test_myenv/lib/python3.6/site-packages (from scikit-image) (1.5.4)
+Collecting tifffile>=2019.7.26
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/42/6b/93a8ee61c6fbe20fa9c17928bd3b80484902b7fd454cecaffba42f5052cb/tifffile-2020.9.3-py3-none-any.whl (148 kB)
+Collecting numpy>=1.15.1
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/14/32/d3fa649ad7ec0b82737b92fefd3c4dd376b0bb23730715124569f38f3a08/numpy-1.19.5-cp36-cp36m-manylinux2010_x86_64.whl (14.8 MB)
+Requirement already satisfied: imageio>=2.3.0 in /home/qwe/miniconda3/envs/test_myenv/lib/python3.6/site-packages (from scikit-image) (2.5.0)
+Collecting PyWavelets>=1.1.1
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/59/bb/d2b85265ec9fa3c1922210c9393d4cdf7075cc87cce6fe671d7455f80fbc/PyWavelets-1.1.1-cp36-cp36m-manylinux1_x86_64.whl (4.4 MB)
+Requirement already satisfied: pillow!=7.1.0,!=7.1.1,>=4.3.0 in /home/qwe/miniconda3/envs/test_myenv/lib/python3.6/site-packages (from scikit-image) (8.4.0)
+Collecting cycler>=0.10
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/5c/f9/695d6bedebd747e5eb0fe8fad57b72fdf25411273a39791cde838d5a8f51/cycler-0.11.0-py3-none-any.whl (6.4 kB)
+Collecting pyparsing!=2.0.4,!=2.1.2,!=2.1.6,>=2.0.3
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/80/c1/23fd82ad3121656b585351aba6c19761926bb0db2ebed9e4ff09a43a3fcc/pyparsing-3.0.7-py3-none-any.whl (98 kB)
+Collecting kiwisolver>=1.0.1
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/a7/1b/cbd8ae738719b5f41592a12057ef5442e2ed5f5cb5451f8fc7e9f8875a1a/kiwisolver-1.3.1-cp36-cp36m-manylinux1_x86_64.whl (1.1 MB)
+Collecting python-dateutil>=2.1
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/36/7a/87837f39d0296e723bb9b62bbb257d0355c7f6128853c78955f57342a56d/python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
+Collecting decorator<5,>=4.3
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/ed/1b/72a1821152d07cf1d8b6fce298aeb06a7eb90f4d6d41acec9861e7cc6df0/decorator-4.4.2-py2.py3-none-any.whl (9.2 kB)
+Requirement already satisfied: six>=1.5 in /home/qwe/miniconda3/envs/test_myenv/lib/python3.6/site-packages (from python-dateutil>=2.1->matplotlib!=3.0.0,>=2.0.0->scikit-image) (1.16.0)
+Installing collected packages: python-dateutil, pyparsing, numpy, kiwisolver, decorator, cycler, tifffile, PyWavelets, networkx, matplotlib, scikit-image
+  Attempting uninstall: numpy
+    Found existing installation: numpy 1.14.5
+    Uninstalling numpy-1.14.5:
+      Successfully uninstalled numpy-1.14.5
+Successfully installed PyWavelets-1.1.1 cycler-0.11.0 decorator-4.4.2 kiwisolver-1.3.1 matplotlib-3.3.4 networkx-2.5.1 numpy-1.19.5 pyparsing-3.0.7 python-dateutil-2.8.2 scikit-image-0.17.2 tifffile-2020.9.3

@@ -14,9 +14,10 @@ from utils.lr_controller import ReduceLROnPlateau
 from utils.data_loader import data_loader, data_loader_multi_channel
 from utils.utils import img_comp
 from utils.loss import loss_mse_ssim
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--gpu_id", type=int, default=4)
+parser.add_argument("--gpu_id", type=int, default=0)    #默认为0
 parser.add_argument("--gpu_memory_fraction", type=float, default=0.3)
 parser.add_argument("--mixed_precision_training", type=int, default=1)
 parser.add_argument("--data_dir", type=str, default="../dataset/train/F-actin")
@@ -24,21 +25,21 @@ parser.add_argument("--save_weights_dir", type=str, default="../trained_models")
 parser.add_argument("--model_name", type=str, default="DFGAN")
 parser.add_argument("--patch_height", type=int, default=128)
 parser.add_argument("--patch_width", type=int, default=128)
-parser.add_argument("--input_channels", type=int, default=9)
+parser.add_argument("--input_channels", type=int, default=9)    #输入图像的通道数。对于彩色图像，通常为3（R、G、B）。对于多光谱图像等其他类型的图像，通道数可能更高
 parser.add_argument("--scale_factor", type=int, default=2)
-parser.add_argument("--norm_flag", type=int, default=1)
-parser.add_argument("--iterations", type=int, default=1000000)
-parser.add_argument("--sample_interval", type=int, default=500)
-parser.add_argument("--validate_interval", type=int, default=1000)
-parser.add_argument("--validate_num", type=int, default=500)
+parser.add_argument("--norm_flag", type=int, default=1) #是否使用像素归一化，1表示使用，0表示不使用。
+parser.add_argument("--iterations", type=int, default=1000000)  #训练的总迭代次数。
+parser.add_argument("--sample_interval", type=int, default=500) #每隔多少迭代保存一次生成的样本图像。
+parser.add_argument("--validate_interval", type=int, default=1000)  #每隔多少迭代进行一次模型验证。
+parser.add_argument("--validate_num", type=int, default=500)    #每次验证时用于计算验证损失的样本数量。
 parser.add_argument("--batch_size", type=int, default=2)
-parser.add_argument("--d_start_lr", type=float, default=2e-5)  # 2e-5
-parser.add_argument("--g_start_lr", type=float, default=1e-4)  # 1e-4
-parser.add_argument("--lr_decay_factor", type=float, default=0.5)
-parser.add_argument("--load_weights", type=int, default=1)
+parser.add_argument("--d_start_lr", type=float, default=2e-5)  # 2e-5   #判别器（discriminator）的学习率的起始值
+parser.add_argument("--g_start_lr", type=float, default=1e-4)  # 1e-4   #生成器（generator）的学习率的起始值。
+parser.add_argument("--lr_decay_factor", type=float, default=0.5)   #学习率衰减因子。
+parser.add_argument("--load_weights", type=int, default=1)  #是否从预训练的权重文件中加载权重。
 parser.add_argument("--optimizer_name", type=str, default="adam")
-parser.add_argument("--train_discriminator_times", type=int, default=1)
-parser.add_argument("--train_generator_times", type=int, default=3)
+parser.add_argument("--train_discriminator_times", type=int, default=1) #训练判别器的次数。每个时刻，判别器会被训练 train_discriminator_times 次。
+parser.add_argument("--train_generator_times", type=int, default=3) #训练生成器的次数。每个时刻，生成器会被训练 train_generator_times 次。
 
 args = parser.parse_args()
 gpu_id = str(args.gpu_id)
@@ -82,7 +83,7 @@ else:
     train_images_path = data_dir + '/training/'
     validate_images_path = data_dir + '/validate/'
 save_weights_path = save_weights_dir + '/' + save_weights_name + '/'
-train_gt_path = data_dir + '/training_gt/'
+train_gt_path = data_dir + '/training_gt/'  #训练数据的Ground Truth图像的路径
 validate_gt_path = data_dir + '/validate_gt/'
 sample_path = save_weights_path + 'sampled_img/'
 
@@ -101,7 +102,7 @@ optimizer_g = optimizers.adam(lr=g_start_lr, beta_1=0.9, beta_2=0.999)
 # --------------------------------------------------------------------------------
 #                           define discriminator model
 # --------------------------------------------------------------------------------
-d = DFGAN50.Discriminator((patch_height * scale_factor, patch_width * scale_factor, 1))
+d = DFGAN50.Discriminator((patch_height * scale_factor, patch_width * scale_factor, 1)) #判别器
 d.compile(loss='binary_crossentropy', optimizer=optimizer_d, metrics=['accuracy'])
 
 # --------------------------------------------------------------------------------
@@ -111,9 +112,9 @@ frozen_d = Model(inputs=d.inputs, outputs=d.outputs)
 frozen_d.trainable = False
 g = modelFN.Generator((patch_height, patch_width, input_channels))
 input_lp = Input((patch_height, patch_width, input_channels))
-fake_hp = g(input_lp)
+fake_hp = g(input_lp)   #模型输出的伪造HP的张量，lp：low patch
 judge = frozen_d(fake_hp)
-combined = Model(input_lp, [judge, fake_hp])
+combined = Model(input_lp, [judge, fake_hp])    #Keras模型的计算结构是由Keras根据张量之间的连接关系自动推导出来的
 label = np.zeros(batch_size)
 combined.compile(loss=['binary_crossentropy', loss_mse_ssim], optimizer=optimizer_g, loss_weights=[0.1, 1])  # 0.1 1
 
@@ -128,7 +129,7 @@ lr_controller_d = ReduceLROnPlateau(model=d, factor=lr_decay_factor, patience=10
 log_path = save_weights_path + 'graph'
 if not os.path.exists(log_path):
     os.mkdir(log_path)
-callback = TensorBoard(log_path)
+callback = TensorBoard(log_path)    #训练过程中的指标和其他信息记录到TensorBoard日志目录中，以便在TensorBoard中可视化
 callback.set_model(g)
 train_names = ['Generator_loss', 'Discriminator_loss']
 val_names = ['val_MSE', 'val_SSIM', 'val_PSNR', 'val_NRMSE']
@@ -204,7 +205,7 @@ def Validate(iter, sample=0):
 # --------------------------------------------------------------------------------
 #                             if exist, load weights
 # --------------------------------------------------------------------------------
-if load_weights:
+if load_weights:    #不是很懂这段代码的设计意图，不是相当于什么都没做吗->如果此时有weights.best有值不就被清空了吗？？
     if os.path.exists(save_weights_path + 'weights.best'):
         g.save_weights(save_weights_path + 'weights.best')
         d.save_weights(save_weights_path + 'weights_disc.best')
@@ -227,7 +228,7 @@ lr_controller_g.on_train_begin()
 lr_controller_d.on_train_begin()
 validate_nrmse = [np.Inf]
 images_path = glob.glob(train_images_path + '*')
-for it in range(iterations):
+for it in tqdm(range(iterations)):
 
     # ------------------------------------
     #         train discriminator
