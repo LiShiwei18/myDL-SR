@@ -7,22 +7,24 @@ from .common import fft2d, fftshift2d, gelu, pixel_shiffle, conv_block2d, global
 
 
 def FCALayer(input, channel, reduction=16, size_psc=128):
-    absfft1 = Lambda(fft2d)(input)
-    absfft1 = Lambda(fftshift2d, arguments={'size_psc': size_psc})(absfft1)
-    absfft2 = Conv2D(channel, kernel_size=3, activation='relu', padding='same')(absfft1)
-    W = Lambda(global_average_pooling2d)(absfft2)
-    W = Conv2D(channel // reduction, kernel_size=1, activation='relu', padding='same')(W)
+    '''基于Fourier变换的通道注意力机制'''
+    absfft1 = Lambda(fft2d)(input)  #输入input进行二维FFT变换
+    absfft1 = Lambda(fftshift2d, arguments={'size_psc': size_psc})(absfft1)  #对FFT后的结果进行中心化，以便更好地进行特征提取
+    absfft2 = Conv2D(channel, kernel_size=3, activation='relu', padding='same')(absfft1)    #特征图
+    W = Lambda(global_average_pooling2d)(absfft2)   #全局平均池化
+    W = Conv2D(channel // reduction, kernel_size=1, activation='relu', padding='same')(W)     # 1x1卷积
     W = Conv2D(channel, kernel_size=1, activation='sigmoid', padding='same')(W)
-    mul = multiply([input, W])
+    mul = multiply([input, W])  #使用multiply函数将输入input和W相乘，实现通道加权
     return mul
 
 
 def FCAB(input, channel, size_psc=128):
-    conv = Conv2D(channel, kernel_size=3, padding='same')(input)
+    '''实现了通道注意力机制（channel attention）和空间注意力机制（spatial attention）'''
+    conv = Conv2D(channel, kernel_size=3, padding='same')(input)    #
     conv = Lambda(gelu)(conv)
     conv = Conv2D(channel, kernel_size=3, padding='same')(conv)
     conv = Lambda(gelu)(conv)
-    att = FCALayer(conv, channel, reduction=16, size_psc=size_psc)
+    att = FCALayer(conv, channel, reduction=16, size_psc=size_psc)  #频率可分离卷积实现空间注意力机制
     output = add([att, input])
     return output
 
