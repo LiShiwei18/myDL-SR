@@ -12,12 +12,14 @@ from utils.lr_controller import ReduceLROnPlateau
 from utils.data_loader import data_loader, data_loader_multi_channel
 from utils.utils import img_comp
 from utils.loss import loss_mse_ssim
+from tqdm import tqdm 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--gpu_id", type=int, default=1)
-parser.add_argument("--gpu_memory_fraction", type=float, default=0.3)
+parser.add_argument("--gpu_id", type=int, default=0)
+parser.add_argument("--gpu_memory_fraction", type=float, default=0.8)
 parser.add_argument("--mixed_precision_training", type=int, default=1)
-parser.add_argument("--data_dir", type=str, default="../dataset/train/F-actin")
+# parser.add_argument("--data_dir", type=str, default="../dataset/train/F-actin")
+parser.add_argument("--data_dir", type=str, default="/root/autodl-tmp/F-actin")
 parser.add_argument("--save_weights_dir", type=str, default="../trained_models")
 parser.add_argument("--model_name", type=str, default="DFCAN")
 parser.add_argument("--patch_height", type=int, default=128)
@@ -193,7 +195,7 @@ loss_record = []
 validate_nrmse = [np.Inf]
 lr_controller.on_train_begin()
 images_path = glob.glob(train_images_path + '/*')
-for it in range(iterations):
+for it in tqdm(range(iterations)):
     # ------------------------------------
     #         train generator
     # ------------------------------------
