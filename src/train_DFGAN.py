@@ -21,7 +21,7 @@ parser.add_argument("--gpu_id", type=int, default=0)    #默认为0
 parser.add_argument("--gpu_memory_fraction", type=float, default=0.8)   #7G不够用，很快就用完了
 parser.add_argument("--mixed_precision_training", type=int, default=1)
 # parser.add_argument("--data_dir", type=str, default="../dataset/train/F-actin") 
-parser.add_argument("--data_dir", type=str, default="/root/autodl-tmp/dataset/F-actin")   #修改成服务器上的地址
+parser.add_argument("--data_dir", type=str, default="/root/autodl-tmp/F-actin")   #修改成服务器上的地址
 parser.add_argument("--save_weights_dir", type=str, default="../trained_models")
 parser.add_argument("--model_name", type=str, default="DFGAN")
 parser.add_argument("--patch_height", type=int, default=128)

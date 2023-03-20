@@ -6,7 +6,7 @@ from keras import optimizers
 import imageio
 import os
 import tensorflow as tf
-from models import *
+from models import DFGAN50, DFCAN16
 from utils.utils import prctile_norm, rm_outliers
 from tqdm import tqdm
 
